@@ -1,10 +1,22 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Context } from '../context/BlogContext';
 import { Feather } from '@expo/vector-icons';
 
 const IndexScreen = ({ navigation }) => {
-	const { state, deleteBlogPost } = useContext(Context);
+	const { state, deleteBlogPost, getBlogPosts } = useContext(Context);
+	//useEffect only called once we need it to fetch the data from server and not get infinte loop
+	useEffect(() => {
+		getBlogPosts();
+		//did focus index screen is primpy screen on device will get invoked
+		const listener = navigation.addListener('didFocus', () => {
+			getBlogPosts();
+		});
+		return () => {
+			//invoked if the index screen stop showing in the screen
+			listener.remove();
+		};
+	}, []);
 	return (
 		<View>
 			<FlatList
